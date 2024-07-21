@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Binary Data</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 220px; /* Adjust width to fit 4 boxes */
+            margin: 20px;
+        }
+        .box {
+            width: 50px; /* Width of each box */
+            height: 50px; /* Height of each box */
+            display: inline-block;
+            box-sizing: border-box;
+        }
+        .box.white {
+            background-color: white;
+        }
+        .box.blue {
+            background-color: blue;
+        }
+        .box.red {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="container" class="container"></div>
+
+    <script>
+        // Fetch the file and display its contents
+        fetch('bigpi.txt')
+            .then(response => response.text())
+            .then(content => displayBinary(content))
+            .catch(error => console.error('Error fetching file:', error));
+
+        function displayBinary(content) {
+            const container = document.getElementById('container');
+            container.innerHTML = ''; // Clear previous content
+
+            // Define the pattern to look for
+            const pattern = '0111110011110101';
+
+            // Remove any non-binary characters and split the content into individual characters
+            const binaryArray = content.replace(/[^01]/g, '').split('');
+            
+            // Create a binary string from the array for easy pattern matching
+            const binaryString = binaryArray.join('');
+
+            // Initialize an array to store box styles
+            const boxStyles = [];
+
+            // Find the pattern and mark the corresponding boxes
+            for (let i = 0; i <= binaryString.length - pattern.length; i++) {
+                if (binaryString.substring(i, i + pattern.length) === pattern) {
+                    for (let j = 0; j < pattern.length; j++) {
+                        boxStyles[i + j] = pattern[j] === '1' ? 'red' : 'white';
+                    }
+                }
+            }
+
+            // Process each digit and append corresponding box
+            binaryArray.forEach((digit, index) => {
+                if (index % 4 === 0 && index !== 0) {
+                    // Add a line break after every 4 boxes
+                    container.appendChild(document.createElement('br'));
+                }
+
+                const box = document.createElement('div');
+                const styleClass = boxStyles[index] || (digit === '1' ? 'blue' : 'white');
+                box.className = 'box ' + styleClass;
+                container.appendChild(box);
+            });
+        }
+    </script>
+</body>
+</html>
